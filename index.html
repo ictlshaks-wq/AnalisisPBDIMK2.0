@@ -565,19 +565,16 @@
 
             const imk = { 'A':0, 'E':0, 'I':0, 'K':0, 'R':0, 'S':0 };
             currentFilteredData.forEach(d => { if(imk[d['KOD IMK']] !== undefined) imk[d['KOD IMK']]++; });
-            const imkKeys = Object.keys(imk);
-            const imkColors = imkKeys.map(k => (k === 'I' || k === 'R') ? '#1a73e8' : '#ff9800');
-            Plotly.restyle('imkChart', { 
-                y: [Object.values(imk)], 
-                x: [imkKeys], 
-                text: [Object.values(imk)], 
-                'marker.color': [imkColors] 
-            });
+            const imkVals = Object.values(imk);
+            const imkTexts = imkVals.map(v => total > 0 ? `${((v/total)*100).toFixed(1)}% (${v})` : `0% (0)`);
+            Plotly.restyle('imkChart', { y: [imkVals], x: [Object.keys(imk)], text: [imkTexts], textposition: 'auto', marker: {color: '#1a73e8'} });
 
             const ppdCounts = {};
             currentFilteredData.forEach(d => { const p = String(d['KET_PPD'] || 'TIADA PPD').trim(); ppdCounts[p] = (ppdCounts[p] || 0) + 1; });
             const sortedPPD = Object.entries(ppdCounts).sort((a,b) => a[1] - b[1]);
-            Plotly.restyle('ppdBarChart', { y: [sortedPPD.map(x => x[0])], x: [sortedPPD.map(x => x[1])], text: [sortedPPD.map(x => x[1])], marker: {color: '#34a853'} });
+            const ppdVals = sortedPPD.map(x => x[1]);
+            const ppdTexts = ppdVals.map(v => total > 0 ? `${((v/total)*100).toFixed(1)}% (${v})` : `0% (0)`);
+            Plotly.restyle('ppdBarChart', { y: [sortedPPD.map(x => x[0])], x: [ppdVals], text: [ppdTexts], textposition: 'auto', marker: {color: '#34a853'} });
 
             const uCounts = { 'LAYAK':0, 'NEAR MISS':0, 'TIDAK MELEPASI':0, 'TIADA DATA':0 };
             currentFilteredData.forEach(d => {
@@ -587,7 +584,9 @@
                 else if(s.includes('NEAR MISS')) uCounts['NEAR MISS']++; 
                 else uCounts['TIADA DATA']++;
             });
-            Plotly.restyle('uasaFullChart', { y: [Object.keys(uCounts)], x: [Object.values(uCounts)], text: [Object.values(uCounts)], 'marker.color': [['#2e7d32', '#1a73e8', '#c62828', '#757575']] });
+            const uVals = Object.values(uCounts);
+            const uTexts = uVals.map(v => total > 0 ? `${((v/total)*100).toFixed(1)}% (${v})` : `0% (0)`);
+            Plotly.restyle('uasaFullChart', { y: [Object.keys(uCounts)], x: [uVals], text: [uTexts], textposition: 'auto', 'marker.color': [['#2e7d32', '#1a73e8', '#c62828', '#757575']] });
         } catch (e) {}
 
         const schools = {};
